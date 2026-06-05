@@ -49,10 +49,7 @@ export default async function SearchResultsPage({ params, searchParams }: Search
       </div>
 
       {/* Filters Sticky Bar */}
-      <SearchFilters 
-        currentFilters={filters} 
-        onFilterChange={() => {}} // In a real app, this would push to router
-      />
+      <SearchFilters currentFilters={filters} />
 
       {/* Results Grid */}
       <main className="max-w-7xl mx-auto px-4 py-8">
