@@ -1,6 +1,6 @@
 # BhumiSure - Real Estate Discovery Platform 🏠
 
-BhumiSure is a specialized real estate discovery platform built to solve the "Social Media Supply" problem. It automatically ingests property reels from Instagram/YouTube, extracts structured data using AI (GPT-4o), and presents them in a premium, searchable discovery interface.
+BhumiSure is a specialized real estate discovery platform built to solve the "Social Media Supply" problem. It automatically ingests property reels from Instagram/YouTube, extracts structured data using OpenRouter (`openrouter/free`), and presents them in a premium, searchable discovery interface.
 
 ## 🚀 Core Features
 
@@ -17,7 +17,7 @@ BhumiSure is a specialized real estate discovery platform built to solve the "So
 - **Framework**: Next.js 14 (App Router)
 - **Database**: Supabase (PostgreSQL + RLS)
 - **Styling**: Tailwind CSS
-- **AI Engine**: OpenAI GPT-4o (Extraction) & Whisper (Transcription)
+- **AI Engine**: OpenRouter `openrouter/free` (extraction) + yt-dlp captions/subtitles
 - **State Management**: Zustand & TanStack Query
 - **Background Jobs**: Custom Local Workers (Polling-based)
 

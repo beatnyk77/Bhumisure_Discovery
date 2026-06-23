@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { adminSupabase } from '@/lib/supabase/admin'
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
 
     return NextResponse.json({ data })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API Admin Jobs] Failed to fetch:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }

@@ -39,8 +39,8 @@ export default function AdminIngestPage() {
       setReelUrl('')
       setManualTranscript('')
       fetchJobs()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Submit failed')
     } finally {
       setLoading(false)
     }
@@ -48,7 +48,19 @@ export default function AdminIngestPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Ingestion</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Admin Ingestion</h1>
+        <button
+          type="button"
+          onClick={async () => {
+            await fetch('/api/admin/logout', { method: 'POST' })
+            window.location.href = '/admin/login'
+          }}
+          className="text-sm text-slate-500 hover:text-slate-800"
+        >
+          Sign out
+        </button>
+      </div>
 
       <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-12">
         <h2 className="text-xl font-semibold mb-4">Submit New Reel</h2>
@@ -95,6 +107,7 @@ export default function AdminIngestPage() {
                 <th className="p-4 font-semibold text-slate-700">Progress</th>
                 <th className="p-4 font-semibold text-slate-700">Result</th>
                 <th className="p-4 font-semibold text-slate-700">Created</th>
+                <th className="p-4 font-semibold text-slate-700">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -118,17 +131,30 @@ export default function AdminIngestPage() {
                       />
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-slate-600">
+                  <td className="p-4 text-sm text-slate-600 max-w-xs truncate">
                     {job.step_label || '---'}
                   </td>
                   <td className="p-4 text-xs text-slate-500">
                     {new Date(job.created_at).toLocaleString()}
                   </td>
+                  <td className="p-4">
+                    {job.status === 'completed' && !job.listing_id && (
+                      <a
+                        href={`/admin/review/${job.id}`}
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                      >
+                        Review →
+                      </a>
+                    )}
+                    {job.listing_id && (
+                      <span className="text-xs text-green-600 font-medium">Published</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {jobs.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-slate-400">No jobs found</td>
+                  <td colSpan={6} className="p-8 text-center text-slate-400">No jobs found</td>
                 </tr>
               )}
             </tbody>

@@ -54,4 +54,7 @@ export type ListingCardData = Pick<
   | 'broker_name' | 'broker_phone' | 'thumbnail_url'
   | 'status' | 'created_at' | 'expiry_date' | 'last_verified_at'
   | 'view_count' | 'enquiry_count'
->
+> & {
+  title?: string
+  locality_name?: string
+}

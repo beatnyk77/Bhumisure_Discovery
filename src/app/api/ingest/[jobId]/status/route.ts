@@ -20,7 +20,7 @@ export async function GET(
 
     return NextResponse.json(job)
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API Ingest Status] Failed to fetch:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }

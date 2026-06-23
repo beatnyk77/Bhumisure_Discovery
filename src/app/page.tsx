@@ -1,101 +1,81 @@
-import Image from "next/image";
+import { SiteHeader } from '@/components/layout/SiteHeader'
+import { CityCard } from '@/components/city/CityCard'
+import { CITY_REGISTRY, getLiveCities } from '@/constants/cities'
+import { getActiveListingCountsByCity } from '@/lib/locality-stats'
 
-export default function Home() {
+export default async function Home() {
+  const cityCounts = await getActiveListingCountsByCity()
+  const liveCities = getLiveCities()
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-slate-950 text-white">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-[120px]" />
+        <div className="absolute top-1/2 -left-32 w-[400px] h-[400px] rounded-full bg-violet-600/15 blur-[100px]" />
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      <SiteHeader variant="dark" />
+
+      <main className="relative max-w-6xl mx-auto px-4 pb-24">
+        <section className="pt-16 sm:pt-24 pb-16 text-center sm:text-left">
+          <p className="text-blue-400 text-sm font-semibold uppercase tracking-[0.2em] mb-5">
+            India&apos;s reel-native rental search
+          </p>
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight max-w-4xl text-balance">
+            Find verified flats from real broker reels — not endless scrolling.
+          </h1>
+          <p className="text-slate-400 text-lg sm:text-xl mt-6 max-w-2xl leading-relaxed">
+            BhumiSure turns Instagram & YouTube walkthroughs into structured listings.
+            Filter by city, locality, budget & BHK. Call or WhatsApp brokers in one tap.
+          </p>
+
+          {liveCities.length > 0 && (
+            <div className="mt-10 flex flex-wrap gap-3 justify-center sm:justify-start">
+              {liveCities.map((city) => (
+                <a
+                  key={city.slug}
+                  href={`/${city.slug}`}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white text-slate-900 font-semibold hover:bg-slate-100 transition-all duration-200 hover:scale-[1.02] min-h-[48px]"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Explore {city.name}
+                  {(cityCounts[city.slug] ?? 0) > 0 && (
+                    <span className="text-slate-500 font-normal">· {cityCounts[city.slug]} live</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="mb-16">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold">Choose your city</h2>
+              <p className="text-slate-400 text-sm mt-1">Live markets first — more metros rolling out nationwide</p>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {CITY_REGISTRY.map((city) => (
+              <CityCard key={city.slug} city={city} listingCount={cityCounts[city.slug] ?? 0} />
+            ))}
+          </div>
+        </section>
+
+        <section className="grid sm:grid-cols-3 gap-4 text-sm">
+          {[
+            { title: 'Video as proof', desc: 'Every listing links to a real walkthrough reel — not stock photos.' },
+            { title: 'Fresh inventory', desc: 'Listings expire after 45 days. Stale flats get hidden automatically.' },
+            { title: 'Direct contact', desc: 'Call or WhatsApp the broker instantly. No lead forms, no waiting.' },
+          ].map((item) => (
+            <div key={item.title} className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+              <p className="font-bold text-white mb-2">{item.title}</p>
+              <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
-  );
+  )
 }

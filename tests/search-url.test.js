@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { buildListingSearchHref, normalizeRentInput } from '../src/lib/search-url.js'
+import { buildListingSearchHref, normalizeRentInput } from '../src/lib/search-url.ts'
 
 test('normalizeRentInput parses valid rent values and rejects blanks', () => {
   assert.equal(normalizeRentInput('12500'), 12500)

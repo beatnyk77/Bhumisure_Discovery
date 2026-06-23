@@ -1,6 +1,7 @@
 import type { PropertyType, FurnishingType, TenantType } from './listing'
 
 export interface SearchParams {
+  city?: string
   q?: string
   locality?: string[]
   property_type?: PropertyType

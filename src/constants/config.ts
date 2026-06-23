@@ -6,8 +6,9 @@ export const APP_CONFIG = {
   MAX_INGESTION_RETRIES: 3,
   INGESTION_TIMEOUT_MS: 90_000,   // 90s target
   JUST_LISTED_DAYS: 3,
-  PILOT_CITY: 'indore',
+  DEFAULT_CITY: 'indore',
   MVP_LISTING_TARGET: 200,
+  OPENROUTER_MODEL: 'openrouter/free',
 } as const
 
 export const WHATSAPP_TEMPLATES = {

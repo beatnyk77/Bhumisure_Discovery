@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     return new NextResponse('OK', { status: 200 })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[WhatsApp Webhook] Failed:', error)
     return new NextResponse('Error', { status: 500 })
   }

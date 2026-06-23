@@ -1,12 +1,11 @@
--- Enable extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+-- Enable extensions (gen_random_uuid is built-in on Supabase Postgres 15+)
+CREATE EXTENSION IF NOT EXISTS "pg_trgm" WITH SCHEMA extensions;
 
 -- =====================
 -- LOCALITIES
 -- =====================
 CREATE TABLE localities (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug        TEXT UNIQUE NOT NULL,       -- e.g. 'vijay_nagar'
   name        TEXT NOT NULL,              -- e.g. 'Vijay Nagar'
   city        TEXT NOT NULL DEFAULT 'indore',
@@ -18,7 +17,7 @@ CREATE TABLE localities (
 -- BROKERS
 -- =====================
 CREATE TABLE brokers (
-  id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   auth_user_id     UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
   name             TEXT,
   phone            TEXT UNIQUE NOT NULL,  -- E.164 normalised
@@ -36,7 +35,7 @@ CREATE TYPE listing_status_enum AS ENUM ('draft','active','expiring_soon','expir
 CREATE TYPE listing_source_enum AS ENUM ('operator_ingestion','broker_native','user_submitted');
 
 CREATE TABLE listings (
-  id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Source
   reel_url          TEXT UNIQUE NOT NULL,
@@ -106,7 +105,7 @@ CREATE TYPE ingestion_status_enum AS ENUM (
 );
 
 CREATE TABLE ingestion_jobs (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reel_url      TEXT NOT NULL,
   status        ingestion_status_enum NOT NULL DEFAULT 'pending',
   progress      INTEGER DEFAULT 0,  -- 0-100
@@ -127,7 +126,7 @@ CREATE INDEX idx_ingestion_jobs_created ON ingestion_jobs(created_at DESC);
 -- LISTING EVENTS (audit log)
 -- =====================
 CREATE TABLE listing_events (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   listing_id  UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
   event_type  TEXT NOT NULL,   -- e.g. 'status_changed', 'price_updated', 'renewed'
   payload     JSONB,
@@ -141,7 +140,7 @@ CREATE INDEX idx_listing_events_listing ON listing_events(listing_id, created_at
 -- ENQUIRY EVENTS (analytics)
 -- =====================
 CREATE TABLE enquiry_events (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   listing_id  UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
   event_type  TEXT NOT NULL,  -- 'call_tap' | 'whatsapp_tap' | 'save'
   created_at  TIMESTAMPTZ DEFAULT NOW()

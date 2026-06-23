@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function BrokerClaimPage() {
-  const params = useParams()
   const router = useRouter()
   const [step, setStep] = useState<'info' | 'otp' | 'success'>('info')
   const [phone, setPhone] = useState('')

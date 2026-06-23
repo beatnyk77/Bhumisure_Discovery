@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { PropertyType } from '@/types/listing'
-import { INDORE_LOCALITIES } from '@/constants/localities'
+import { LocalityEntry } from '@/constants/cities/types'
 import { buildListingSearchHref, normalizeRentInput } from '@/lib/search-url'
 
 interface SearchFiltersProps {
@@ -13,14 +13,16 @@ interface SearchFiltersProps {
     min_rent?: number
     max_rent?: number
   }
+  citySlug: string
+  localityChips: LocalityEntry[]
 }
 
-export function SearchFilters({ currentFilters }: SearchFiltersProps) {
+export function SearchFilters({ currentFilters, citySlug, localityChips }: SearchFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = useParams<{ city?: string; locality?: string }>()
   const propertyTypes: PropertyType[] = ['1BHK', '2BHK', '3BHK', 'PG', 'Studio', 'Room']
-  const city = typeof params?.city === 'string' ? params.city : 'indore'
+  const city = citySlug || (typeof params?.city === 'string' ? params.city : 'indore')
   const selectedLocality = typeof params?.locality === 'string' ? params.locality : 'all'
   const [draftMinRent, setDraftMinRent] = useState(currentFilters.min_rent?.toString() ?? '')
   const [draftMaxRent, setDraftMaxRent] = useState(currentFilters.max_rent?.toString() ?? '')
@@ -49,8 +51,6 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
     router.push(href)
   }
 
-  const localityChips = useMemo(() => INDORE_LOCALITIES.slice(0, 6), [])
-
   const applyRentRange = () => {
     pushFilters({
       minRent: normalizeRentInput(draftMinRent) ?? null,
@@ -63,15 +63,15 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
   }
 
   return (
-    <div className="bg-white border-b border-slate-200 sticky top-0 z-20 overflow-x-auto">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4 whitespace-nowrap no-scrollbar">
-        {/* Property Type Filter */}
-        <div className="flex gap-2">
+    <div className="bg-white border-b border-slate-200 sticky top-16 z-20">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 w-full sm:w-auto">
           {propertyTypes.map((type) => (
             <button
               key={type}
+              type="button"
               onClick={() => pushFilters({ propertyType: currentFilters.property_type === type ? null : type })}
-              className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+              className={`shrink-0 px-3.5 py-2 rounded-full border text-sm font-medium transition-colors duration-200 min-h-[40px] ${
                 currentFilters.property_type === type
                   ? 'bg-slate-900 border-slate-900 text-white'
                   : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
@@ -82,11 +82,11 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
           ))}
         </div>
 
-        <div className="w-px h-6 bg-slate-200 mx-2" />
+        <div className="hidden sm:block w-px h-8 bg-slate-200" />
 
-        {/* Locality Quick Filters */}
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar w-full sm:w-auto flex-1">
           <button
+            type="button"
             onClick={() =>
               router.push(
                 buildListingSearchHref({
@@ -99,7 +99,7 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
                 })
               )
             }
-            className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+            className={`shrink-0 px-3.5 py-2 rounded-full border text-sm font-medium transition-colors duration-200 min-h-[40px] ${
               selectedLocality === 'all'
                 ? 'bg-blue-600 border-blue-600 text-white'
                 : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
@@ -110,11 +110,12 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
           {localityChips.map((loc) => (
             <button
               key={loc.slug}
+              type="button"
               onClick={() => {
                 const nextLocality = selectedLocality === loc.slug ? 'all' : loc.slug
                 pushFilters({ localitySlug: nextLocality })
               }}
-              className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+              className={`shrink-0 px-3.5 py-2 rounded-full border text-sm font-medium transition-colors duration-200 min-h-[40px] ${
                 selectedLocality === loc.slug
                   ? 'bg-blue-600 border-blue-600 text-white'
                   : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
@@ -125,13 +126,11 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
           ))}
         </div>
 
-        <div className="w-px h-6 bg-slate-200 mx-2" />
-
-        {/* Rent Range (Simple) */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto pt-1 sm:pt-0">
           <input
             type="number"
             placeholder="Min ₹"
+            aria-label="Minimum rent"
             value={draftMinRent}
             onChange={(e) => setDraftMinRent(e.target.value)}
             onKeyDown={(e) => {
@@ -140,12 +139,13 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
                 applyRentRange()
               }
             }}
-            className="w-24 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full sm:w-24 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none min-h-[40px]"
           />
-          <span className="text-slate-400">-</span>
+          <span className="text-slate-300 hidden sm:inline">–</span>
           <input
             type="number"
             placeholder="Max ₹"
+            aria-label="Maximum rent"
             value={draftMaxRent}
             onChange={(e) => setDraftMaxRent(e.target.value)}
             onKeyDown={(e) => {
@@ -154,17 +154,19 @@ export function SearchFilters({ currentFilters }: SearchFiltersProps) {
                 applyRentRange()
               }
             }}
-            className="w-24 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full sm:w-24 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none min-h-[40px]"
           />
           <button
+            type="button"
             onClick={applyRentRange}
-            className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors"
+            className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors min-h-[40px] shrink-0"
           >
             Apply
           </button>
           <button
+            type="button"
             onClick={clearFilters}
-            className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:border-slate-400 transition-colors"
+            className="px-3 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors min-h-[40px] shrink-0"
           >
             Clear
           </button>

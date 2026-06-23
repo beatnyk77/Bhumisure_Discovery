@@ -11,13 +11,15 @@ export interface IngestionJob {
   status: IngestionStatus
   progress: number
   step_label: string | null
-  result: ExtractionResult | null
+  result: (ExtractionResult & { dedup_info?: DedupResult; reel_url?: string }) | null
   error_log: string | null
   retry_count: number
   created_at: string
   updated_at: string
   completed_at: string | null
   listing_id: string | null
+  source_type?: string | null
+  manual_transcript?: string | null
 }
 
 export interface FieldConfidence {

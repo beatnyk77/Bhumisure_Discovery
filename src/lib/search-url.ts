@@ -1,26 +1,35 @@
-export function normalizeRentInput(value) {
-  if (value === undefined || value === null) {
-    return undefined
-  }
+import { ReadonlyURLSearchParams } from 'next/navigation'
+import { PropertyType } from '@/types/listing'
+
+export function normalizeRentInput(value: string | number | undefined | null): number | undefined {
+  if (value === undefined || value === null) return undefined
 
   const trimmed = String(value).trim()
-  if (!trimmed) {
-    return undefined
-  }
+  if (!trimmed) return undefined
 
   const parsed = Number.parseInt(trimmed, 10)
   return Number.isNaN(parsed) || parsed <= 0 ? undefined : parsed
 }
 
+interface BuildListingSearchHrefArgs {
+  city: string
+  locality: string
+  searchParams?: ReadonlyURLSearchParams | URLSearchParams | null
+  propertyType?: PropertyType | null
+  minRent?: number | null
+  maxRent?: number | null
+  resetPage?: boolean
+}
+
 export function buildListingSearchHref({
   city,
   locality,
-  searchParams,
+  searchParams = null,
   propertyType,
   minRent,
   maxRent,
   resetPage = true,
-}) {
+}: BuildListingSearchHrefArgs): string {
   const params = new URLSearchParams(searchParams?.toString() || '')
 
   if (propertyType) {
